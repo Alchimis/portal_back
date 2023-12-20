@@ -46,4 +46,10 @@ func Migrate() {
 	if err != nil {
 		log.Fatal("failed migrate auth module:", err)
 	}
+
+	err = cmd.Migrate(cmd.NewConfig())
+
+	if err != nil {
+		log.Fatal("failed migrate documentation module:", err)
+	}
 }
