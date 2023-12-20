@@ -9,6 +9,8 @@ import (
 	authcmd "portal_back/authentication/cmd"
 	di "portal_back/authentication/cmd"
 	companycmd "portal_back/company/cmd"
+	"portal_back/documentation/cmd"
+	di2 "portal_back/documentation/impl/di"
 	documentationDi "portal_back/documentation/impl/di"
 	rolesDi "portal_back/roles/impl/di"
 )
@@ -21,7 +23,7 @@ func InitAppModule() {
 	}
 	defer authConn.Close(context.Background())
 
-	documentConnection := documentationDi.InitDocumentModule(authService)
+	documentConnection := documentationDi.InitDocumentModule(authService, cmd.NewConfig())
 	defer documentConnection.Close(context.Background())
 
 	rolesModule := rolesDi.InitRolesModule()
