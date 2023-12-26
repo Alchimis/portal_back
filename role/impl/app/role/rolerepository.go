@@ -2,6 +2,7 @@ package role
 
 import (
 	"context"
+	"portal_back/role/api/internalapi/model"
 	"portal_back/role/impl/domain"
 )
 
@@ -10,4 +11,5 @@ type RoleRepository interface {
 	GetUserRoles(context context.Context, userId int) ([]domain.Role, error)
 	AssignRoleToUser(context context.Context, roleId, userId int) error
 	RemoveRoleFromUser(context context.Context, roleId, userId int) error
+	IsUserHasRole(context context.Context, accountId int, roleType model.RoleType) (bool, error)
 }

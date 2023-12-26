@@ -2,6 +2,7 @@ package role
 
 import (
 	"context"
+	"portal_back/role/api/internalapi/model"
 	"portal_back/role/impl/domain"
 )
 
@@ -10,6 +11,7 @@ type RoleService interface {
 	GetUserRoles(context context.Context, userId int) ([]domain.Role, error)
 	AssignRoleToUser(context context.Context, roleId, userId int) error
 	RemoveRoleFromUser(context context.Context, roleId, userId int) error
+	IsUserHasRole(context context.Context, accountId int, roleType model.RoleType) (bool, error)
 }
 
 type service struct {
@@ -34,4 +36,8 @@ func (service *service) AssignRoleToUser(context context.Context, roleId, userId
 
 func (service *service) RemoveRoleFromUser(context context.Context, roleId, userId int) error {
 	return service.repo.RemoveRoleFromUser(context, roleId, userId)
+}
+
+func (service *service) IsUserHasRole(context context.Context, accountId int, roleType model.RoleType) (bool, error) {
+	return service.repo.IsUserHasRole(context, accountId, roleType)
 }
