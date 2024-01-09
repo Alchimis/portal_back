@@ -2,7 +2,6 @@ package di
 
 import (
 	"context"
-	psql "database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5"
@@ -42,37 +41,7 @@ func InitAuthModule() (internalapi.AuthRequestService, *pgx.Conn) {
 
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, 5432, dbUser, dbPassword, dbName)
 
-	db, err := psql.Open("postgres", connStr)
-	if err != nil {
-		fmt.Printf("!!!!!!!!!!!!!Error asdfasdfasdf!!!!! %s", err)
-	} else {
-		fmt.Printf("!!!CONNECTED adsfadsfafds!!")
-	}
-	if db == nil {
-		fmt.Printf("!!!!!!!!!!!!!Error asdfasdfasdf!!!!")
-	}
-
-	test := "test6"
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	//defer cancel()
-	query := `
-		SELECT token FROM tokens
-		WHERE user_id = $1
-	`
-
-	rows := db.QueryRowContext(ctx, query, test)
-	var salt string
-	err = rows.Scan(&salt)
-	if err != nil {
-		fmt.Printf("QUERY!!!!!! %s", err)
-	}
-	fmt.Printf(salt)
-
-	defer db.Close()
-
-	ctx2, cancel2 := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel2()
-	conn, err := pgx.Connect(ctx2, connStr)
+	conn, err := pgx.Connect(context.Background(), connStr)
 
 	if err != nil {
 		fmt.Printf("Error asdfasdfasdf!!!!! %s", err)
