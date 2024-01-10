@@ -1,42 +1,40 @@
 package cmd
 
 import (
+	stdsql "database/sql"
 	"errors"
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"path/filepath"
 )
 
 func Migrate(config Config) error {
 	conn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.DBHost, 5432, config.DBUser, config.DBPassword, config.DBName)
-	//db, err := stdsql.Open("postgres", conn)
+	db, err := stdsql.Open("postgres", conn)
 
-	//if err != nil {
-	//	fmt.Println("1")
-	//	return err
-	//}
+	if err != nil {
+		fmt.Println("1")
+		return err
+	}
 
-	//driver, err := postgres.WithInstance(db, &postgres.Config{})
-	//if err != nil {
-	//	fmt.Println("2")
-	//	return err
-	//}
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		fmt.Println("2")
+		return err
+	}
 
-	migrations, err := filepath.Abs("authentication/db/migrations")
-	m, err := migrate.New(
-		"file://app/authentication/db/migrations",
-		conn)
+	migrations, err := filepath.Abs("./authentication/db/migrations")
 	fmt.Println(migrations)
 	if err != nil {
 		fmt.Println("3")
 		return err
 	}
 
-	//m, err := migrate.NewWithDatabaseInstance(
-	//	fmt.Sprintf("file:///%s", migrations),
-	//	config.DBName, driver)
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://app/authentication/db/migrations",
+		config.DBName, driver)
 	if err != nil {
 		fmt.Println("4")
 		return err
