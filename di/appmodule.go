@@ -24,9 +24,6 @@ func InitAppModule() {
 	documentConnection := documentationDi.InitDocumentModule(authService)
 	defer documentConnection.Close(context.Background())
 
-	// можно инжектить в другие модули
-	authService.IsAuthenticated("")
-
 	rolesModule := rolesDi.InitRolesModule()
 
 	companycmd.InitCompanyModule(companycmd.NewConfig(), authService, userRequestService, rolesModule)

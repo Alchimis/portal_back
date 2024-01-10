@@ -52,22 +52,6 @@ func InitAuthModule(config Config) (internalapi.AuthRequestService, internalapi.
 	return authRequestService, userRequestService, conn, nil
 }
 
-func methodNotAllowedHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Access-Control-Request-Method") != "" {
-			setCorsHeaders(w)
-		}
-		w.WriteHeader(http.StatusNoContent)
-	})
-}
-
-func setCorsHeaders(w http.ResponseWriter) {
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, PATCH, DELETE")
-	w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, X-user-id, X-organization-id")
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
-}
-
 func ConnectLoop(connStr string, timeout time.Duration) (*pgx.Conn, error) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
@@ -83,9 +67,22 @@ func ConnectLoop(connStr string, timeout time.Duration) (*pgx.Conn, error) {
 			if err == nil {
 				return db, nil
 			}
-			if db != nil {
-
-			}
 		}
 	}
+}
+
+func methodNotAllowedHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Access-Control-Request-Method") != "" {
+			setCorsHeaders(w)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+}
+
+func setCorsHeaders(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, PATCH, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, X-user-id, X-organization-id")
+	w.Header().Set("Access-Control-Allow-Origin", "https://dev4.env.teamtells.ru")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 }
