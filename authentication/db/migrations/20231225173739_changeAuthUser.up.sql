@@ -1,0 +1,3 @@
+ALTER TABLE auth_user DROP COLUMN login;
+ALTER TABLE auth_user
+    ADD COLUMN email VARCHAR(256) NOT NULL;

@@ -1,4 +1,4 @@
-package di
+package cmd
 
 import (
 	"context"
@@ -7,38 +7,22 @@ import (
 	"github.com/jackc/pgx/v5"
 	_ "github.com/lib/pq"
 	"net/http"
-	"os"
 	"portal_back/authentication/api/frontend"
 	"portal_back/authentication/api/internalapi"
 	"portal_back/authentication/impl/app/auth"
 	"portal_back/authentication/impl/app/authrequest"
 	"portal_back/authentication/impl/app/token"
+	"portal_back/authentication/impl/app/userrequest"
 	"portal_back/authentication/impl/infrastructure/sql"
 	"portal_back/authentication/impl/infrastructure/transport"
 	"time"
 )
 
-func InitAuthModule() (internalapi.AuthRequestService, *pgx.Conn) {
-	dbUser := os.Getenv("DB_USER")
-	if dbUser == "" {
-		dbUser = "postgres"
-	}
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/lib/pq"
+)
 
-	dbPassword := os.Getenv("DB_PASSWORD")
-	if dbPassword == "" {
-		dbPassword = "password"
-	}
-
-	dbName := os.Getenv("DB_NAME")
-	if dbName == "" {
-		dbName = "app"
-	}
-
-	dbHost := os.Getenv("DB_HOST")
-	if dbHost == "" {
-		dbHost = "localhost"
-	}
-
+func InitAuthModule(config Config) (internalapi.AuthRequestService, internalapi.UserRequestService, *pgx.Conn, error) {
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, 5432, dbUser, dbPassword, dbName)
 
 	conn, err := ConnectLoop(connStr, 30*time.Second)
@@ -49,13 +33,14 @@ func InitAuthModule() (internalapi.AuthRequestService, *pgx.Conn) {
 		fmt.Printf("CONNECTED adsfadsfafds!!")
 	}
 
-	repo := sql.NewTokenStorage(conn)
-	tokenService := token.NewService(repo)
+	repoId := sql.NewTokenStorage(conn)
+	tokenService := token.NewService(repoId)
 
 	authRepo := sql.NewAuthRepository(conn)
 	authService := auth.NewService(authRepo, tokenService)
 	server := transport.NewServer(authService, tokenService)
 	authRequestService := authrequest.NewService()
+	userRequestService := userrequest.NewService(authService)
 
 	router := mux.NewRouter()
 	router.MethodNotAllowedHandler = methodNotAllowedHandler()
@@ -72,7 +57,7 @@ func InitAuthModule() (internalapi.AuthRequestService, *pgx.Conn) {
 	r := frontendapi.HandlerWithOptions(server, options)
 	http.Handle("/authorization/", r)
 
-	return authRequestService, conn
+	return authRequestService, userRequestService, conn, nil
 }
 
 func ConnectLoop(connStr string, timeout time.Duration) (*pgx.Conn, error) {
