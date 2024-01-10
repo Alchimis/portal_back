@@ -26,13 +26,14 @@ func Migrate(config Config) error {
 	}
 
 	migrations, err := filepath.Abs("./authentication/db/migrations")
+	fmt.Println(migrations)
 	if err != nil {
 		fmt.Println("3")
 		return err
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		fmt.Sprintf("file://%s", migrations),
+		fmt.Sprintf("file:///%s", migrations),
 		config.DBName, driver)
 	if err != nil {
 		fmt.Println("4")
