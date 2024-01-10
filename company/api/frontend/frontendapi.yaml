@@ -317,7 +317,6 @@ components:
         type: object
         required:
           - employeeID
-          - departmentID
         properties:
           employeeID:
             type: integer
