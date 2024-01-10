@@ -30,9 +30,7 @@ func Migrate(config Config) error {
 
 	entries, err := os.ReadDir(migrations)
 
-	if len(entries) == 0 {
-		fmt.Println("empty")
-	}
+	fmt.Println(len(entries))
 
 	if err != nil {
 		fmt.Println(err)
