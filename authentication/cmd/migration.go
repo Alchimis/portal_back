@@ -26,7 +26,7 @@ func Migrate(config Config) error {
 		return err
 	}
 
-	migrations, err := filepath.Abs("./authentication/db/migrations")
+	migrations, err := filepath.Abs("authentication/db/migrations")
 	fmt.Println(migrations)
 	if err != nil {
 		fmt.Println("3")
