@@ -26,7 +26,7 @@ func Migrate(config Config) error {
 
 	migrations, err := filepath.Abs("authentication/db/migrations")
 	m, err := migrate.New(
-		"file://db/migrations",
+		fmt.Sprintf("file:///%s", migrations),
 		conn)
 	fmt.Println(migrations)
 	if err != nil {
