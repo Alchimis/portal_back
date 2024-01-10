@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"path/filepath"
 )
 
@@ -25,7 +26,7 @@ func Migrate(config Config) error {
 		return err
 	}
 
-	migrations, err := filepath.Abs("../authentication/db/migrations")
+	migrations, err := filepath.Abs("./authentication/db/migrations")
 	fmt.Println(migrations)
 	if err != nil {
 		fmt.Println("3")
