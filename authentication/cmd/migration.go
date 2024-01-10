@@ -31,6 +31,8 @@ func Migrate(config Config) error {
 	entries, err := os.ReadDir(migrations)
 	if err != nil {
 		fmt.Println(err)
+	} else {
+		fmt.Println("ok")
 	}
 
 	for _, e := range entries {
