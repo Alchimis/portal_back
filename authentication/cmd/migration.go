@@ -29,6 +29,7 @@ func Migrate(config Config) error {
 	migrations, err := filepath.Abs("./authentication/db/migrations")
 
 	entries, err := os.ReadDir(migrations)
+	fmt.Println(os.Getwd())
 	if err != nil {
 		fmt.Println(err)
 	} else {
