@@ -33,7 +33,7 @@ func Migrate(config Config) error {
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"/app/authentication/db/migrations",
+		"file:///app/authentication/db/migrations",
 		config.DBName, driver)
 	if err != nil {
 		fmt.Println("4")
