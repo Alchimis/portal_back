@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5"
 	_ "github.com/lib/pq"
@@ -18,20 +19,11 @@ import (
 	"time"
 )
 
-	_ "github.com/golang-migrate/migrate/v4/source/file"
-	_ "github.com/lib/pq"
-)
-
 func InitAuthModule(config Config) (internalapi.AuthRequestService, internalapi.UserRequestService, *pgx.Conn, error) {
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, 5432, dbUser, dbPassword, dbName)
+	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		config.DBHost, 5432, config.DBUser, config.DBPassword, config.DBName)
 
-	conn, err := ConnectLoop(connStr, 30*time.Second)
-
-	if err != nil {
-		fmt.Printf("Error asdfasdfasdf!!!!! %s", err)
-	} else {
-		fmt.Printf("CONNECTED adsfadsfafds!!")
-	}
+	conn, _ := ConnectLoop(connStr, 30*time.Second)
 
 	repoId := sql.NewTokenStorage(conn)
 	tokenService := token.NewService(repoId)
@@ -76,10 +68,8 @@ func ConnectLoop(connStr string, timeout time.Duration) (*pgx.Conn, error) {
 				return db, nil
 			}
 			if db != nil {
-				fmt.Println("Connected???")
+
 			}
-			fmt.Println("Error asdfasdfasdf!!!!!")
-			fmt.Println(err)
 		}
 	}
 }

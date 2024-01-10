@@ -14,7 +14,6 @@ import (
 )
 
 func InitAppModule() {
-
 	authService, userRequestService, authConn, err := di.InitAuthModule(authcmd.NewConfig())
 	if authConn == nil {
 		fmt.Printf("Can't connect to teamtells database")
@@ -43,7 +42,7 @@ func InitAppModule() {
 	}
 }
 
-func migrate() {
+func Migrate() {
 	err := authcmd.Migrate(authcmd.NewConfig())
 	if err != nil {
 		log.Fatal("failed migrate auth module:", err)

@@ -20,7 +20,7 @@ type frontendServer struct {
 }
 
 func (s *frontendServer) GetSaltByEmail(w http.ResponseWriter, r *http.Request, email string) {
-	if login == "test7" {
+	if email == "test7" {
 		w.Header().Set("Content-Type", "application/json")
 		salt := "asdfadsfasfd"
 		resp, _ := json.Marshal(frontendapi.SaltResponse{
