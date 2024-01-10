@@ -15,16 +15,19 @@ func Migrate(config Config) error {
 	db, err := stdsql.Open("postgres", conn)
 
 	if err != nil {
+		fmt.Println("1")
 		return err
 	}
 
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
+		fmt.Println("2")
 		return err
 	}
 
 	migrations, err := filepath.Abs("./authentication/db/migrations")
 	if err != nil {
+		fmt.Println("3")
 		return err
 	}
 
@@ -32,12 +35,16 @@ func Migrate(config Config) error {
 		fmt.Sprintf("file:%s", migrations),
 		config.DBName, driver)
 	if err != nil {
+		fmt.Println("4")
 		return err
 	}
 
 	err = m.Up()
 	if errors.Is(err, migrate.ErrNoChange) {
+		fmt.Println("5")
 		return nil
 	}
+	fmt.Println("6")
+
 	return err
 }
