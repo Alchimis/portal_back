@@ -5,7 +5,6 @@ import (
 	"errors"
 	"portal_back/authentication/api/internalapi"
 	"portal_back/company/impl/domain"
-	"portal_back/core/network"
 )
 
 var EmployeeAlreadyExists = errors.New("employee with this email already exists in your company")
@@ -14,8 +13,8 @@ var EmployeeNotFound = errors.New("employee not found")
 type Service interface {
 	GetEmployee(ctx context.Context, id int) (domain.EmployeeWithConnections, error)
 	CreateEmployee(ctx context.Context, dto domain.EmployeeRequest, companyID int) error
-	DeleteEmployee(ctx context.Context, id int, departmentID int) error
-	EditEmployee(ctx context.Context, id int, dto domain.EmployeeRequest, requestInfo network.RequestInfo) error
+	DeleteEmployee(ctx context.Context, id int, departmentID *int) error
+	EditEmployee(ctx context.Context, id int, dto domain.EmployeeRequest) error
 
 	GetCountOfEmployees(ctx context.Context, departmentID int) (int, error)
 	GetDepartmentEmployees(ctx context.Context, departmentID int) ([]domain.Employee, error)
@@ -85,8 +84,12 @@ func (s *service) GetEmployee(ctx context.Context, id int) (domain.EmployeeWithC
 	return s.repository.GetEmployee(ctx, id)
 }
 
-func (s *service) DeleteEmployee(ctx context.Context, id int, departmentID int) error {
-	err := s.repository.DeleteEmployeeFromDepartment(ctx, id, departmentID)
+func (s *service) DeleteEmployee(ctx context.Context, id int, departmentID *int) error {
+	if departmentID == nil {
+		return s.repository.DeleteEmployee(ctx, id)
+	}
+
+	err := s.repository.DeleteEmployeeFromDepartment(ctx, id, *departmentID)
 	if err != nil {
 		return err
 	}
@@ -103,8 +106,12 @@ func (s *service) DeleteEmployee(ctx context.Context, id int, departmentID int) 
 
 }
 
-func (s *service) EditEmployee(ctx context.Context, id int, dto domain.EmployeeRequest, requestInfo network.RequestInfo) error {
-	return nil
+func (s *service) EditEmployee(ctx context.Context, id int, dto domain.EmployeeRequest) error {
+	_, err := s.repository.GetEmployee(ctx, id)
+	if err != nil {
+		return err
+	}
+	return s.repository.EditEmployee(ctx, id, dto)
 }
 
 func (s *service) MoveEmployeesToDepartment(ctx context.Context, dto domain.MoveEmployeesRequest) error {
