@@ -17,4 +17,5 @@ RUN CGO_ENABLED=0 go build -o app -buildvcs=false main.go
 FROM alpine
 WORKDIR /app
 COPY --from=builder /app/app ./
+COPY --from=builder /app/authorization/db/migrations ./authorization/db/migrations
 CMD ["./app"]
