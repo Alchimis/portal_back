@@ -10,8 +10,10 @@ import (
 )
 
 func Migrate(config Config) error {
-	conn := fmt.Sprintf("postgres://%s:%s@%s:5432/%s?sslmode=disable", config.DBUser, config.DBPassword, config.DBHost, config.DBName)
-	db, err := stdsql.Open("postgres", conn)
+	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		config.DBHost, 5432, config.DBUser, config.DBPassword, config.DBName)
+
+	db, err := stdsql.Open("postgres", connStr)
 	if err != nil {
 		return err
 	}

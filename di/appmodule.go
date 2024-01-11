@@ -10,7 +10,6 @@ import (
 	di "portal_back/authentication/cmd"
 	companycmd "portal_back/company/cmd"
 	"portal_back/documentation/cmd"
-	di2 "portal_back/documentation/impl/di"
 	documentationDi "portal_back/documentation/impl/di"
 	rolesDi "portal_back/roles/impl/di"
 )
