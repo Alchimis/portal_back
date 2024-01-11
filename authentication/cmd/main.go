@@ -16,6 +16,7 @@ import (
 	"portal_back/authentication/impl/app/userrequest"
 	"portal_back/authentication/impl/infrastructure/sql"
 	"portal_back/authentication/impl/infrastructure/transport"
+	"portal_back/core/network"
 	"time"
 )
 
@@ -35,13 +36,13 @@ func InitAuthModule(config Config) (internalapi.AuthRequestService, internalapi.
 	userRequestService := userrequest.NewService(authService)
 
 	router := mux.NewRouter()
-	router.MethodNotAllowedHandler = methodNotAllowedHandler()
+	router.MethodNotAllowedHandler = network.MethodNotAllowedHandler()
 
 	options := frontendapi.GorillaServerOptions{
 		BaseRouter: router,
 		Middlewares: []frontendapi.MiddlewareFunc{func(handler http.Handler) http.Handler {
 			return http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				setCorsHeaders(w)
+				network.SetCorsHeaders(w)
 				handler.ServeHTTP(w, r)
 			}))
 		}},
@@ -69,20 +70,4 @@ func ConnectLoop(connStr string, timeout time.Duration) (*pgx.Conn, error) {
 			}
 		}
 	}
-}
-
-func methodNotAllowedHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Access-Control-Request-Method") != "" {
-			setCorsHeaders(w)
-		}
-		w.WriteHeader(http.StatusNoContent)
-	})
-}
-
-func setCorsHeaders(w http.ResponseWriter) {
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, PATCH, DELETE")
-	w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, X-user-id, X-organization-id")
-	w.Header().Set("Access-Control-Allow-Origin", "https://dev4.env.teamtells.ru")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
 }
