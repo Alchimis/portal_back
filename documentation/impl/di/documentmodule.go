@@ -32,7 +32,7 @@ func InitDocumentModule(authRequestService internalapi.AuthRequestService, confi
 		BaseRouter: router,
 		Middlewares: []frontendapi.MiddlewareFunc{func(handler http.Handler) http.Handler {
 			return http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				network.SetCorsHeaders(w)
+				network.SetCorsHeaders(w, r)
 				handler.ServeHTTP(w, r)
 			}))
 		}},
