@@ -18,4 +18,5 @@ FROM alpine
 WORKDIR /app
 COPY --from=builder /app/app ./
 COPY --from=builder /app/authentication/db/migrations ./authentication/db/migrations
+COPY --from=builder /app/documentation/db/migrations ./documentation/db/migrations
 CMD ["./app"]
