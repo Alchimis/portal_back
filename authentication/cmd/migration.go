@@ -26,7 +26,7 @@ func Migrate(config Config) error {
 		return err
 	}
 
-	migrations, err := filepath.Abs("/home")
+	migrations, err := filepath.Abs("/app/app")
 
 	entries, err := os.ReadDir(migrations)
 
