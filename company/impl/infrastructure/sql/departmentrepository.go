@@ -70,20 +70,20 @@ func (r repository) CreateDepartment(ctx context.Context, request domain.Departm
 func (r repository) GetDepartment(ctx context.Context, id int) (domain.Department, error) {
 	query := `
 		SELECT department.id, department.name, department.parentdepartmentid, parentDepartment.name, 
-		       department.supervisorid, employeeaccount.firstname
+		       department.supervisorid, employeeaccount.firstname, employeeaccount.secondname, employeeaccount.surname
 		FROM department
 		LEFT JOIN employeeaccount ON department.supervisorid = employeeaccount.id
-		LEFT JOIN department AS parentDepartment ON department.parentdepartmentid = department.id
+		LEFT JOIN department AS parentDepartment ON department.parentdepartmentid = parentDepartment.id
 		WHERE department.id = $1
 	`
 
 	var departmentInfo domain.Department
 
 	var supervisorID, parentDepartmentID sql.NullInt32
-	var supervisorName, parentDepartmentName sql.NullString
+	var supervisorFirstName, supervisorSecondName, supervisorSurname, parentDepartmentName sql.NullString
 
 	err := r.conn.QueryRow(ctx, query, id).Scan(&departmentInfo.Id, &departmentInfo.Name, &parentDepartmentID,
-		&parentDepartmentName, &supervisorID, &supervisorName)
+		&parentDepartmentName, &supervisorID, &supervisorFirstName, &supervisorSecondName, &supervisorSurname)
 	if err == pgx.ErrNoRows {
 		return departmentInfo, department.NotFound
 	}
@@ -99,7 +99,7 @@ func (r repository) GetDepartment(ctx context.Context, id int) (domain.Departmen
 	if supervisorID.Valid {
 		departmentInfo.Supervisor = &domain.Supervisor{
 			Id:   int(supervisorID.Int32),
-			Name: supervisorName.String,
+			Name: supervisorFirstName.String + " " + supervisorSecondName.String + " " + supervisorSurname.String,
 		}
 	}
 

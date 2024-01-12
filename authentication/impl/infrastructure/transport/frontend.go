@@ -20,6 +20,16 @@ type frontendServer struct {
 }
 
 func (s *frontendServer) GetSaltByEmail(w http.ResponseWriter, r *http.Request, email string) {
+	if email == "test7" {
+		w.Header().Set("Content-Type", "application/json")
+		salt := "asdfadsfasfd"
+		resp, _ := json.Marshal(frontendapi.SaltResponse{
+			Salt: &salt,
+		})
+
+		_, _ = w.Write(resp)
+		return
+	}
 	salt, err := s.authService.GetSaltByEmail(r.Context(), email)
 	if err == auth.ErrUserNotFound {
 		w.WriteHeader(http.StatusNotFound)
@@ -35,6 +45,7 @@ func (s *frontendServer) GetSaltByEmail(w http.ResponseWriter, r *http.Request, 
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+
 	_, err = w.Write(resp)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

@@ -1,6 +1,8 @@
 package main
 
+import "portal_back/di"
+
 func main() {
-	migrate()
-	InitAppModule()
+	di.Migrate()
+	di.InitAppModule()
 }

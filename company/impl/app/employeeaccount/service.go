@@ -13,7 +13,7 @@ var EmployeeNotFound = errors.New("employee not found")
 type Service interface {
 	GetEmployee(ctx context.Context, id int) (domain.EmployeeWithConnections, error)
 	CreateEmployee(ctx context.Context, dto domain.EmployeeRequest, companyID int) error
-	DeleteEmployee(ctx context.Context, id int, departmentID int) error
+	DeleteEmployee(ctx context.Context, id int, departmentID *int) error
 	EditEmployee(ctx context.Context, id int, dto domain.EmployeeRequest) error
 
 	GetCountOfEmployees(ctx context.Context, departmentID int) (int, error)
@@ -84,8 +84,12 @@ func (s *service) GetEmployee(ctx context.Context, id int) (domain.EmployeeWithC
 	return s.repository.GetEmployee(ctx, id)
 }
 
-func (s *service) DeleteEmployee(ctx context.Context, id int, departmentID int) error {
-	err := s.repository.DeleteEmployeeFromDepartment(ctx, id, departmentID)
+func (s *service) DeleteEmployee(ctx context.Context, id int, departmentID *int) error {
+	if departmentID == nil {
+		return s.repository.DeleteEmployee(ctx, id)
+	}
+
+	err := s.repository.DeleteEmployeeFromDepartment(ctx, id, *departmentID)
 	if err != nil {
 		return err
 	}
