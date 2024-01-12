@@ -12,11 +12,13 @@ import (
 	"portal_back/company/impl/app/employeeaccount"
 	"portal_back/company/impl/infrastructure/sql"
 	"portal_back/company/impl/infrastructure/transport"
+	"portal_back/core/network"
 	rolesapi "portal_back/roles/api/internalapi"
 )
 
 func InitCompanyModule(config Config, authApi internalapi.AuthRequestService, userApi internalapi.UserRequestService, rolesApi rolesapi.RolesRequestService) {
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:5432/%s", config.DBUser, config.DBPassword, config.DBHost, config.DBName)
+	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		config.DBHost, 5432, config.DBUser, config.DBPassword, config.DBName)
 
 	conn, _ := pgx.Connect(context.Background(), connStr)
 
@@ -29,13 +31,13 @@ func InitCompanyModule(config Config, authApi internalapi.AuthRequestService, us
 	server := transport.NewServer(accountService, departmentService, rolesApi, authApi)
 
 	router := mux.NewRouter()
-	router.MethodNotAllowedHandler = methodNotAllowedHandler()
+	router.MethodNotAllowedHandler = network.MethodNotAllowedHandler()
 
 	options := frontendapi.GorillaServerOptions{
 		BaseRouter: router,
 		Middlewares: []frontendapi.MiddlewareFunc{func(handler http.Handler) http.Handler {
 			return http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				setCorsHeaders(w)
+				network.SetCorsHeaders(w, r)
 				handler.ServeHTTP(w, r)
 			}))
 		}},
@@ -43,20 +45,4 @@ func InitCompanyModule(config Config, authApi internalapi.AuthRequestService, us
 	r := frontendapi.HandlerWithOptions(server, options)
 
 	http.Handle("/", r)
-}
-
-func methodNotAllowedHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Access-Control-Request-Method") != "" {
-			setCorsHeaders(w)
-		}
-		w.WriteHeader(http.StatusNoContent)
-	})
-}
-
-func setCorsHeaders(w http.ResponseWriter) {
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, PATCH, DELETE")
-	w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, X-user-id, X-organization-id")
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
 }

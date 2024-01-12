@@ -1,6 +1,6 @@
 package domain
 
 type DeleteEmployeeRequest struct {
-	DepartmentID int
+	DepartmentID *int
 	EmployeeID   int
 }

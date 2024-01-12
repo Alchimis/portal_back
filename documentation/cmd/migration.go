@@ -10,9 +10,10 @@ import (
 )
 
 func Migrate(config Config) error {
-	conn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.DBHost, 5432, config.DBUser, config.DBPassword, config.DBName)
-	db, err := stdsql.Open("postgres", conn)
+
+	db, err := stdsql.Open("postgres", connStr)
 	if err != nil {
 		return err
 	}
@@ -22,7 +23,7 @@ func Migrate(config Config) error {
 		return err
 	}
 
-	migrations, err := filepath.Abs("./authentication/db/migrations")
+	migrations, err := filepath.Abs("./documentation/db/migrations")
 	if err != nil {
 		return err
 	}
